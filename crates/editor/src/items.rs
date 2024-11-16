@@ -635,13 +635,12 @@ impl Item for Editor {
             Some(util::truncate_and_trailoff(description, MAX_TAB_TITLE_LEN))
         });
 
-        // Whether the file was saved in the past but is now deleted.
-        let was_deleted: bool = self
+        let is_deleted: bool = self
             .buffer()
             .read(cx)
             .as_singleton()
             .and_then(|buffer| buffer.read(cx).file())
-            .map_or(false, |file| file.is_deleted() && file.is_created());
+            .map_or(true, |file| file.is_deleted());
 
         h_flex()
             .gap_2()
@@ -649,7 +648,7 @@ impl Item for Editor {
                 Label::new(self.title(cx).to_string())
                     .color(label_color)
                     .italic(params.preview)
-                    .strikethrough(was_deleted),
+                    .strikethrough(is_deleted),
             )
             .when_some(description, |this, description| {
                 this.child(
